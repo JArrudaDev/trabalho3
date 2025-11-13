@@ -1,9 +1,8 @@
 import dash
 from dash import html, dcc
-import pandas as pd
 import plotly.express as px
 from data import produtos, vendas, caixa, clientes
-from charts import grafico_vela, grafico_coluna, grafico_pizza, grafico_wordcloud
+from charts import grafico_vela, grafico_coluna, grafico_pizza, grafico_wordcloud_base64
 
 app = dash.Dash(__name__)
 app.title = "Dashboard Mercadinho"
@@ -12,6 +11,7 @@ app.title = "Dashboard Mercadinho"
 fig_fluxo = grafico_vela(caixa)
 fig_coluna = grafico_coluna(vendas, produtos, top_n=10)
 fig_pizza = grafico_pizza(vendas, produtos, top_n=10)
+wc_base64 = grafico_wordcloud_base64(vendas, produtos, top_n=10)
 
 # Top 10 clientes fiado
 top_clientes = clientes.sort_values('fiado', ascending=False).head(10)
@@ -33,6 +33,9 @@ app.layout = html.Div(children=[
     
     html.H2("Distribuição de Vendas"),
     dcc.Graph(figure=fig_pizza),
+    
+    html.H2("WordCloud - Top 10 Produtos"),
+    html.Img(src=f'data:image/png;base64,{wc_base64}', style={'width':'80%'}),
     
     html.H2("Top 10 Clientes Fiado"),
     html.Table([
