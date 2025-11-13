@@ -1,0 +1,7 @@
+pandas==2.1.1
+numpy==1.26.3
+matplotlib==3.8.1
+plotly==6.4.0
+dash==3.3.0
+wordcloud==1.8.2.2
+faker==23.3.0
