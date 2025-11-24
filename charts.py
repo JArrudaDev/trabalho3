@@ -1,12 +1,22 @@
-import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import plotly.express as px
-import pandas as pd
+import plotly.graph_objects as go
 from io import BytesIO
 import base64
 
 def grafico_vela(caixa):
-    fig = px.line(caixa, x='data', y=['entrada', 'saida'], title='Fluxo de Caixa')
+    # Converte entradas/saídas em saldo cumulativo e gera OHLC sintético
+    df = caixa.copy().sort_values('data').reset_index(drop=True)
+    df['net'] = df['entrada'] - df['saida']
+    df['close'] = df['net'].cumsum()
+    df['open'] = df['close'] - df['net']
+    df['high'] = df[['open', 'close']].max(axis=1)
+    df['low'] = df[['open', 'close']].min(axis=1)
+
+    fig = go.Figure(data=[go.Candlestick(
+        x=df['data'], open=df['open'], high=df['high'], low=df['low'], close=df['close']
+    )])
+    fig.update_layout(title='Fluxo de Caixa (Candlestick)', xaxis_title='Data', yaxis_title='Saldo')
     return fig
 
 def grafico_coluna(vendas, produtos, top_n=10):
